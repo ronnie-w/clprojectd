@@ -6,7 +6,7 @@ struct EmbeddedFile
     string fileData;
 }
 
-static EmbeddedFile[4] EmbeddedFiles = [
+static EmbeddedFile[5] EmbeddedFiles = [
     EmbeddedFile("src/main.lisp", `(in-package :cl-user)
 
 (defpackage {%project-name%}
@@ -37,7 +37,8 @@ static EmbeddedFile[4] EmbeddedFiles = [
 
 Licensed under the {%project-license%} License.
 `),
-    EmbeddedFile("default.asd", `(in-package :asdf-user)
+    EmbeddedFile("default.asd",
+            `(in-package :asdf-user)
 
 (defsystem "{%project-name%}"
   :version "{%project-version%}"
@@ -54,5 +55,26 @@ Licensed under the {%project-license%} License.
   :build-pathname "{%project-name%}"
   ;; entry-point: main is an exported symbol. Otherwise, use "{%project-name%}::main" instead.
   :entry-point "{%project-name%}:main")
+
+;;;; sbcl executable compression
+;;#+sb-core-compression
+;;(defmethod asdf:perform ((o asdf:image-op) (c asdf:system))
+;;  (uiop:dump-image (asdf:output-file o c)
+;;                   :executable t
+;;                   :compression t))
+`), EmbeddedFile("Makefile", `LISP?=sbcl
+run: FORCE
+	@$(LISP) --load {%project-name%}.asd \
+			 --eval '(ql:quickload :{%project-name%})' \
+			 --eval '(in-package :{%project-name%})' \
+			 --eval '(main)'
+
+build: FORCE
+	@$(LISP) --load {%project-name%}.asd \
+			   --eval '(ql:quickload :{%project-name%})' \
+			   --eval '(asdf:make :{%project-name%})' \
+			   --eval '(quit)'
+
+FORCE:
 `),
 ];

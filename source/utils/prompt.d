@@ -17,10 +17,11 @@ struct Prompter
 
 void promptRequest(ProjectDetails* project)
 {
+    writef("cld: a minimal common lisp project creating tool\n");
     void checkEmpty(string prompt, string* defaultVal)
     {
         string valCpy = *defaultVal;
-        writef(prompt, *defaultVal);
+        writef("\t" ~ prompt, *defaultVal);
         stdin.readf("%s\n", defaultVal);
         if (defaultVal.length == 0)
             *defaultVal = valCpy;

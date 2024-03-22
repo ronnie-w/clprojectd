@@ -6,17 +6,20 @@ import core.stdc.stdlib : exit;
 import utils.fs : EmbeddedFiles;
 import utils.prompt : promptRequest, ProjectDetails;
 
-void main(string[] args)
+void initProject()
 {
     ProjectDetails* project = new ProjectDetails();
     promptRequest(project);
 
     string projectName = project.projectName.strip;
     try
-    {
         if (!projectName.exists)
             projectName.mkdir;
-    }
+        else
+        {
+            writeln("Project '" ~ projectName ~ "' already exists. Quitting...");
+            exit(-1);
+        }
     catch (FileException e)
     {
         writeln("Could not initialize project.");
@@ -40,5 +43,37 @@ void main(string[] args)
 		// dfmt on
 
         (projectName ~ "/" ~ EmbeddedFiles[i].fileName).write(parsedData);
+    }
+}
+
+void main(string[] args)
+{
+    // dfmt off
+    alias help = () => writeln(`Usage: cld <options>
+	where <options> are:
+		init:	initialize a basic common lisp project
+		help:	prints this message
+	use:
+		'make build':	to build an executable
+		'make run'  :	to run the project in development mode (starts REPL, use '(quit)' to exit REPL)
+	to use a different lisp implementation, change the 'make' LISP variable
+		eg: 'make build LISP=<installed lisp implementation>'`);
+	// dfmt on
+
+    if (args.length < 2)
+        help();
+    else
+    {
+        switch (args[1])
+        {
+        case "init":
+            initProject();
+            break;
+        case "help":
+            goto default;
+        default:
+            help();
+            break;
+        }
     }
 }
