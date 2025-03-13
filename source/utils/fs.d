@@ -78,3 +78,15 @@ build: FORCE
 FORCE:
 `),
 ];
+
+static EmbeddedFile embeddedCompose = EmbeddedFile(
+        `src/{%project-compose%}.lisp`, `(in-package :cl-user)
+
+(defpackage {%project-name%}.{%project-compose%}
+  (:use :cl)
+  (:export :{%project-compose%}))
+(in-package :{%project-name%}.{%project-compose%})
+
+(defun {%project-compose%} ()
+  (princ "Hello from {%project-name%}.{%project-compose%}"))
+`);
